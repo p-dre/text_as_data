@@ -1,0 +1,139 @@
+---
+title: "4_Text_als_Daten.html"
+author: "Paul Drecker"
+date: '2022-03-23'
+output: html_document
+---
+
+# Achtung die Analyse beinhaltet Spoiler
+# Laden der benötigten packages für alle Schritte
+
+```{r cars, echo=TRUE, message=FALSE, warning=FALSE}
+library(friends)
+library(dplyr)
+library(tidytext)
+library(wordcloud)
+library(reshape2)
+library(word2vec)
+library(harrypotter)
+library(uwot)
+library(plotly)
+library(doc2vec)
+```
+
+# word2vec
+
+Die in 3_Text_als_Daten vorbereiteten Daten werden geladen und aufgrund des stochastischen Charakters von UMAP ein seed gesetzt, um die Ergebnisse reproduzieren zu können. Um die Texte mit word2vec bearbeiten zu können werden alte Texte in einem Vektor zusammengefasst (sapply()). Durch die Funktion word2vec werden die Word-Embeddings berechnet. Hierbei kann die Anzahl der Dimensionen, der Iterationen und die Anzahl der genutzten Kerne gesetzt werden. Mehr Kerne führen vereinfacht gesagt zu einer schnelleren Berechnung. Um eine grafische Darstellung in zwei Dimensionen zu ermöglichen, wird UMAP genutzt. Anschließend werden die Wordvektoren in zwei Dimensionen geplottet.
+
+```{r word2vec_harry, echo=FALSE, message=FALSE, warning=FALSE}
+
+# setting seed (In wahrscheinlichkeitbasierten Modellen ist es notwendig einen seed zu setzen, um reproduzierbare Ergebnisse zu erhalten)
+
+setwd('C:/Users/Drecker/Documents/Lehre')
+load(".\\Daten\\harry_data.Rda")
+set.seed(123456789)
+
+
+vec_harry <- sapply(harry_data$text, paste, collapse=".")
+model <- word2vec(x = vec_harry, type = "cbow", dim = 300, iter = 50, threads	= 4)
+embedding <- as.matrix(model)
+harry_2d <- umap(embedding, n_neighbors = 15, n_threads = 4)
+harry_2d <- as.data.frame(harry_2d)
+names(harry_2d) <- c("x1", "x2")
+
+fig <- plot_ly(harry_2d, x = ~x1, y = ~x2, type = 'scatter', mode = 'markers', text = rownames(embedding) ) %>%
+  layout(plot_bgcolor = "#e5ecf6",
+    xaxis = list(
+      title = "0"),
+    yaxis = list(
+      title = "1"))
+
+fig
+
+
+```
+
+
+
+
+
+# Friends doc2vec
+
+Für den Friendsdatensatz sollen nun Dokument-Embeddings berechnet werden. Um ein anschließendes Labeln zu ermöglichen, wird eine Doc_id erstellt. Durch die Funktion paragraph2vec werden die Dokument-Embeddings berechnet und anschließend durch UMAP auf zwei Dimensionen reduziert. Durch inner_join werden die Embeddings mit dem Labeln über die Doc_id verbunden. Anschließend werden die Daten auf die Hauptcharaktere reduziert.
+
+
+```{r doc2vec_friends, echo=FALSE, message=FALSE, warning=FALSE}
+friends_data <- friends::friends
+
+friends_scene <- friends_data %>% group_by(scene, episode, season) %>% summarise(full_scene = paste0(text, collapse = ""))  %>% arrange(season, episode, scene)
+
+
+friends_data$doc_id <- gsub(" ", paste0(friends_data$speaker, friends_data$season, friends_data$episode, friends_data$scene, friends_data$utterance),replacement =  "")
+
+
+
+model <- paragraph2vec(x = friends_data, type = "PV-DBOW", dim = 300, iter = 50)
+embedding <- as.matrix(model)
+friends_2d <- umap(embedding, n_neighbors = 15, n_threads = 4)
+friends_2d <- as.data.frame(friends_2d)
+friends_2d <-tibble::rownames_to_column(friends_2d)
+names(friends_2d)<- c("doc_id","x1", "x2")
+friends_data <- friends_data %>% inner_join(friends_2d, friends_data, by= c("doc_id"= "doc_id"))
+data <- friends_data%>%
+  filter(speaker == "Monica Geller" | speaker == "Joey Tribbiani" | speaker == "Chandler Bing" | speaker == "Phoebe Buffay"
+         | speaker =="Ross Geller")
+
+
+
+
+fig <- plot_ly(data , x = ~x1, y = ~x2, type = 'scatter', mode = 'markers', color = data$season, text = data$speaker) %>%
+  layout(plot_bgcolor = "#e5ecf6",
+         xaxis = list(
+           title = "0"),
+         yaxis = list(
+           title = "1"))
+
+fig
+
+```
+
+
+
+# By scene
+
+Hier werden nun die Dokument-Embddings pro Szene berechnet und dargestellt. Hierfür werden die Texte pro Szene über group_by zusammengefasst. Alle anderen Schritte bleiben gleich. 
+
+```{r doc2vec_friends_scene, echo=FALSE, message=FALSE, warning=FALSE}
+
+friends_scene <- friends_data %>% group_by(scene, episode, season) %>% summarise(text = paste0(text, collapse = ""))  %>% arrange(season, episode, scene)
+
+
+
+friends_scene$doc_id <- gsub(" ", paste0(friends_scene$season, friends_scene$episode, friends_scene$scene),replacement =  "")
+model <- paragraph2vec(x = friends_scene, type = "PV-DBOW", dim = 300, iter = 50)
+embedding <- as.matrix(model)
+friends_2d <- umap(embedding, n_neighbors = 15, n_threads = 4)
+friends_2d <- as.data.frame(friends_2d)
+friends_2d <-tibble::rownames_to_column(friends_2d)
+names(friends_2d)<- c("doc_id","x1", "x2")
+friends_scene <-friends_scene %>% inner_join(friends_2d, friends_scene, by= c("doc_id"= "doc_id"))
+
+
+
+fig <- plot_ly(friends_scene, x = ~x1, y = ~x2, type = 'scatter', mode = 'markers', color = friends_scene$season, text = friends_scene$season) %>%
+  layout(plot_bgcolor = "#e5ecf6",
+         xaxis = list(
+           title = "0"),
+         yaxis = list(
+           title = "1"))
+
+fig
+
+
+```
+
+
+
+
+
+

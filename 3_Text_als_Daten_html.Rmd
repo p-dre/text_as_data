@@ -1,0 +1,140 @@
+---
+title: "3_text_als_Daten"
+author: "Paul Drecker"
+date: '2022-03-11'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+# Achtung die Analyse beinhaltet Spoiler
+# Laden der benötigten packages für alle Schritte
+
+```{r cars, echo=TRUE, message=FALSE, warning=FALSE}
+library(friends)
+library(dplyr)
+library(tidytext)
+library(wordcloud)
+library(reshape2)
+library(word2vec)
+library(harrypotter)
+library(uwot)
+library(plotly)
+library(doc2vec)
+```
+
+# Friendsdaten
+
+Ziel dieser ersten oberflächlichen Analyse ist es einen Überblick über die verschiedenen Hauptcharaktere zu bekommen.
+Dafür soll für jeden Hauptcharakter untersucht werden, welche Worte und in welcher Anzahl diese genutzt wurden, bzw. wie diese im Verhältnis zueinander stehen.
+Im ersten Schritt werden die gesprochenen Texte, als Daten, aus dem package Friends geladen.
+Anschließend werden die Daten auf die Texte der vier Hauptcharaktere gefiltert.
+Um die Worte pro Hauptcharaktere zu zählen, werden die Texte anhand der Hauptcharaktere gruppiert (group_by), die Text anschließend in einzelne Worte getrennt (unnest_tokens) und dann gezählt (count).
+Durch die Anwendung von arrange() werden die Worte absteigend nach Häufigkeit geordnet.
+Um eine Wordcloud getrennt nach Hauptcharaktere zu plotten ist es notwendig eine Matrix mit den Spalten als Hauptcharaktere und die Anzahl der genutzten Worte als Zeilen zu erstellen (acast).
+
+
+```{r Friendsdaten, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+friends_data <- friends::friends
+
+
+friends_data %>%
+  filter(speaker == "Monica Geller" | speaker == "Joey Tribbiani" | speaker == "Chandler Bing" | speaker == "Phoebe Buffay" | speaker == 'Rachel Green'
+           | speaker =="Ross Geller") %>%
+  group_by(speaker) %>%
+  unnest_tokens(word, text) %>%
+  count(word) %>%
+  arrange(desc(n), .by_group = T)  %>%
+  acast(word ~ speaker, value.var = "n", fill = 0) %>%
+  comparison.cloud( title.size = 1, random.order = FALSE, max.words = 400)
+
+```
+
+
+In der Wordcloud befinden sich die Worte die pro Hauptcharakter am meisten genutzt wurden in der Mitte. Je größer die Wörter, umso mehr wurden die Worte genutzt.
+Auffällig ist, dass Wörter, die häufiger vorkommen, geringen Inhalt transportieren. Nichtsdestotrotz lassen sich bereits erste Aussagen treffen. So zeigt sich bei allen Hauptcharakteren, dass Personen, mit denen diese häufiger interagieren, auch öfter genannt werden. So sagt Rachel häufiger Ross und auch bei Ross ist Rachel unter den meisten genannten Wörtern. Außerdem ist bei Ross ein familiärer Fokus festzustellen und bei Monika die Bedeutung von Liebe und Heiraten. Auch bei den anderen Hauptcharaktern zeigen sich erste Inhalte aus der Serie.
+
+# Harry Potter 
+
+
+Beim Harry Potter Datensatz müssen Bearbeitungschritte durchgeführt werden, um einen Datensatz zu erhalten mit den weitere Rechenschritte möglich sind. 
+Die einzelnen Harry Potter Bücher sind als Listen im package gespeichert. Ziel ist es alle Bücher in einer Tabelle zu speichern. 
+Hierfür wird einen Liste mit den Titel der Bücher und eine Liste der Liste der Büchern erstellt. In einem loop werden nun für jedes Buch in einer Spalte der Titel und der Text des entsprechend Buches gespeichert. 
+In jeder Zeile befindet sich also nach dem Loop ein Buch. 
+
+Für das Erstellen der Wordcloud wird genauso vorgegangen wie oben beid en Friendsdaten. Gruppiert wird jedoch nach den Büchern. 
+
+Wie bereits beim Friendsdatensatz finden sich einige Worte die wenig Inhalt transportieren (the, c, her, said, usw.). Auffällig in der Wordcloud ist die Bedeutung von Namen in den einzelnen Büchern. Es zeigt sich in dieser oberflächlichen Analyse bereits die Bedeutung von einzelnen Personen in den Büchern.
+
+
+```{r potter, echo=FALSE, message=FALSE, warning=FALSE}
+#devtools::install_github("bradleyboehmke/harrypotter")
+setwd('C:/Users/Drecker/Documents/Lehre')
+
+titles <- c("Philosopher's Stone", "Chamber of Secrets", "Prisoner of Azkaban",
+            "Goblet of Fire", "Order of the Phoenix", "Half-Blood Prince",
+            "Deathly Hallows")
+books <- list(philosophers_stone, chamber_of_secrets, prisoner_of_azkaban,
+              goblet_of_fire, order_of_the_phoenix, half_blood_prince,
+              deathly_hallows)
+
+harry_data <- tibble()
+for ( i in seq_along(books)){
+  book <- tibble(title = titles[i],text = toString(books[[i]]))
+  harry_data  <- rbind(harry_data, book)
+
+}
+
+save(harry_data, file = ".\\Daten\\harry_data.Rda")
+
+
+
+harry_data %>% group_by(title) %>%
+  unnest_tokens(word, text) %>%
+  count(word) %>%
+  arrange(desc(n), .by_group = T)  %>%
+  acast(word ~ title, value.var = "n", fill = 0) %>%
+  comparison.cloud( title.size = 1, random.order = T,max.words=400,scale = c(2, 0.5))
+```
+
+
+# N-gram 
+
+Im n-gram Modell werden anders als zuvor nicht einzelne Wörter betrachtet, sondern immer die Kombination von n zusammenhängenden Wörtern. So sind die Bi (2) -grams des Satzes 'I love chocolate': 'I love' und 'love chocolate'. Ziel ist es auch Informationen über mehrere Wörter hinweg in der Analyse berücksichtigen zu können. Das Nutzen von n-grams ist je nach genutzten Modell unterschiedlich sinnvoll. Auch die sinnvolle Länge der n-grams ist abhängig des entsprechenden Textes. Die Änderung auf n-grams lässt sich einfach durch die Formulierung bigram in der unnest_tokenes() Funktion erreichen.
+
+```{r n-potter, echo=FALSE, message=FALSE, warning=FALSE}
+
+harry_data %>% group_by(title) %>%
+  unnest_tokens(bigram,text,token = "ngrams", n = 2 ) %>%
+  count(bigram) %>%
+  arrange(desc(n), .by_group = T)  %>%
+  acast(bigram ~ title, value.var = "n", fill = 0) %>%
+  comparison.cloud( title.size = 1, random.order = T,max.words=200,scale = c(2, 0.5))
+
+```
+
+
+
+
+# tfidf
+
+Das tf-idf Verfahren wird genutzt, um in Analyse die Bedeutung der Wörter im Dokument zu. Steigt die Anzahl eines Terms im Dokument im Vergleich zu anderen Termen im Dokument steigt tf-idf. Um jedoch zu berücksichtigen, dass eine Häufung von bestimmten Wörtern nicht direkt einen Informationsgewinn bedeuten, wenn diese über alle Dokumente hinweg ähnlich verteilt sind, sinkt tf-idf mit der Anzahl an Dokumenten, die diesen Term beinhalten. Die Berechnung von tf-idf erfolgt durch die Funktion bind_tf_idf. Auffällig in der Wordcloud ist, dass sich durch die Anwendung von tf-idf bereits eine deutliche Verbesserung im Informationsgehalt der häufigen Worte erzielen lässt.
+
+
+
+```{r ntfidf-potter, echo=FALSE, message=FALSE, warning=FALSE}
+
+harry_data %>% unnest_tokens(word, text) %>% group_by(title) %>%
+  count(word) %>%
+  bind_tf_idf(word, title, n) %>%
+  acast(word ~ title, value.var = "tf_idf", fill = 0) %>%
+  comparison.cloud( title.size = 1, random.order = T,max.words=200,scale = c(2, 0.5),)
+
+
+
+
+```
