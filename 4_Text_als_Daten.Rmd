@@ -81,7 +81,7 @@ names(friends_2d)<- c("doc_id","x1", "x2")
 friends_data <- friends_data %>% inner_join(friends_2d, friends_data, by= c("doc_id"= "doc_id"))
 data <- friends_data%>%
   filter(speaker == "Monica Geller" | speaker == "Joey Tribbiani" | speaker == "Chandler Bing" | speaker == "Phoebe Buffay"
-         | speaker =="Ross Geller")
+         | speaker =="Ross Geller" | speaker =="Rachel Green")
 
 
 

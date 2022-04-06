@@ -1,0 +1,515 @@
+---
+title: "Einführung R"
+author: "Paul Drecker"
+output: html_document
+---
+
+
+
+
+
+# Installieren von R
+
+In diesem Kurs wird mit der Sprache R gearbeitet. R wird bereits mit einer rudimentären grafischen Benutzer:innenoberfläche geliefert. Ich rate deutlich davon ab, sich auf diese zu beschränken. Durch das Nutzen von RStudio wird das Arbeiten mit R deutlich Benutzer:innenfreundlicher.
+
+
+>1. R Installieren
+>https://cran.r-project.org/ aufrufen
+>Betriebssystem wählen
+>Neuste R Version downloaden und installieren
+
+
+>2. RStudio installieren
+>https://www.rstudio.com/products/rstudio/download/#download aufrufen
+>Free version auswählen
+>Betriebssystem auswählen
+>RStudio installieren
+
+
+# Einführung in R
+
+Es ist möglich jegliche Berechnung, die in einem Taschenrechner möglich sind auch in r auszuführen.
+
+
+```{r taschenrechner, echo=TRUE, message=FALSE, warning=FALSE}
+1+2
+1-2
+2*2
+6/2
+2^2
+```
+
+Auf diese Ergebnisse lässt sich jedoch nicht zugreifen, da sie nicht gespeichert wurden. Durch <- werden Berechnungen einem Objekt zugeordnet und dieses ggf. erstellt. Mit diesen Objekten können dann weiter Berechnungen durchgeführt werden. 
+
+
+```{r taschenrechner2, echo=TRUE, message=FALSE, warning=FALSE}
+a <- 3*5
+a
+
+b <- 4-2
+
+a* b
+
+```
+
+Die erstellten Objekte sind veränderlich. 
+
+```{r taschenrechner3, echo=TRUE, message=FALSE, warning=FALSE}
+
+
+a <- a* b -6 + (2*4)
+a
+
+```
+In der Praxis wird empfohlen, den Objekten aussagekräftige Namen zu geben. Sodass, auch bei späteren Betrachtungen, der Code verständlich bleibt. Da zwischen Groß- und Kleinschreibung unterschieden wird, empfehle ich nur Kleinschreibung zu verwenden, um Verwirrungen zu vermeiden. Den die Objekte Mittelwert und mittelwert sind zwei verschiedene Objekte.
+
+
+```{r taschenrechner4, echo=TRUE, message=FALSE, warning=FALSE}
+
+
+mittelwert <- (1+2+3+4+5+6)/6
+Mittwelwert <- (5+6+7+8) / 4
+```
+
+
+
+
+
+# Funktionen
+
+Führt man eine Operation öfter durch, ist es manchmal sinnvolle eine Funktion im Vorhinein zu definieren, um dann später darauf zuzugreifen.
+
+```{r taschenrechner41, echo=TRUE, message=FALSE, warning=FALSE}
+
+word_printer <- function(word){
+                              print(paste('Dies ist ein Wort:', word ))
+                            }
+
+word_printer('hallo')
+
+```
+
+
+
+
+
+
+## Datenstrukturen
+ 
+Objekte können verschiedenen Klassen angehören. Nicht mit jeder Klasse lässt sich jeder Befehl ausführen. Dies ist auch sinnvoll, da in der Ursprungsform das Rechen mit Buchstaben nicht möglich ist.
+
+```{r taschenrechner5, echo=TRUE, message=FALSE, warning=FALSE}
+
+text <- "Mittwoch ist Spritwoch"
+class(text)
+zahl <- 1
+class(zahl)
+zahl <- "1"
+class(zahl)
+zahl <- 1.1
+class(zahl)
+date <- as.Date("2020-05-05")
+class(date)
+
+x <- "apfel" == "birnen"
+x
+class(x)
+```
+
+### Vektoren
+
+Objekte können jedoch auch mehrere Werte enthalten. Um verschiedene Möglichkeiten der Komplexität zu haben, gibt es verschiedene Datenstrukturen. Bei Vektoren handelt es sich um eindimensionale Reihen von Ausprägungen (aus der Schule bekannt). Die Klasse der Ausprägungen müssen jedoch gleich bleiben sein. Eine Liste hingegen kann verschieden Klassen enthalten. In zwei Dimensionen entspricht der Vektor der Matrix und das Dataframe der Liste. Dataframes können auch mehr als zwei Auf Twitter teilenDimensionen haben, werden jedoch dann Tensor genannt. Auf Ausprägungen in jeder Datenstruktur kann auch einzeln zugegriffen werden.
+
+
+```{r taschenrechner6, echo=TRUE, message=FALSE, warning=FALSE}
+
+vektor_zahlen <- c(1,2,3,4,5)
+
+vektor_zahlen
+
+vektor_text <- c("Dumbledore", "Rubeus Hagrid", "Minerva McGonagall")
+vektor_text
+
+vektor_text[1]
+vektor_text[c(1,2)]
+
+
+
+```
+
+Mit Vektoren können auch Berechnungen durchgeführt werden bzw. die Vektoren als Input in Funktionen gegeben werden. Praktische Funktionen für Vektoren sind beispielsweise mean(), length(), sum() und sd(). Informationen über Funktionen aus Paketen können über ?mean() aufegrufen werden.
+
+```{r taschenrechner7, echo=TRUE, message=FALSE, warning=FALSE}
+
+vektor_zahlen_2 <- c(8,9,0,23,3)
+
+vektor_zahlen * vektor_zahlen_2
+
+
+mean(vektor_zahlen)
+length(vektor_zahlen * vektor_zahlen_2)
+sum(vektor_zahlen * vektor_zahlen_2)
+sd(vektor_zahlen_2)
+
+
+```
+
+# Listen
+
+Listen können verschiedene Klassen von Daten enthalten. Beispielsweise ist die Kombination von character und numeric Klasse möglich. Grundsätzlich können Listen verschiedenste Formate enthalten, z. B. zum Beispiel auch Vektoren oder sogar auch andere Listen. Wenn den Variablen Namen zugewiesen werden, kann auf diese über die $ Option direkt auf die Variabel zugegriffen werden. Wie bereits zuvor ist das Zugreifen über die [] ebenfalls möglich.
+
+
+
+```{r taschenrechner9, echo=TRUE, message=FALSE, warning=FALSE}
+
+mitarbeiter <- list(name = "Dumbledore", "Rubeus Hagrid", "Minerva McGonagall", ort ="hogwarts", Land = "uk",  postleitzahl = 48151 )
+mitarbeiter
+
+mitarbeiter$name
+
+mitarbeiter[1]
+mitarbeiter[[2]]
+mitarbeiter[2]
+
+```
+### Matrizen
+
+Bei Matrizen handelt es um die zweidimensionale äquivalent zum Vektor. Ein zugreifen über den $ Operator ist nicht möglich. Jedoch weiterhin über die []. Wobei die [,1] der ersten Spalte und [1, ] der ersten Zeile entspricht. [2,1] ist dann die erste Zelle in der ersten Spalte in der zweiten Zeile.
+
+
+```{r taschenrechner10, echo=TRUE, message=FALSE, warning=FALSE}
+
+x <- 1:9
+m <- matrix(x, nrow = 3)
+m
+
+colnames(m) <- c("eins", "zwei", "drei")
+rownames(m)<- c("eins", "zwei", "drei")
+m
+
+m[,2]
+
+```
+
+### Dataframe
+
+Bei Dataframes handelt es sich um das meist genutzten Datenformat. Wie bei den Listen kann auf Dataframes direkt auf die Spalten/Variablen über $ zugegriffen werden. Auch können verschiedene Klassen gespeichert werden.
+
+
+```{r taschenrechner11, echo=TRUE, message=FALSE, warning=FALSE}
+
+hogwarts_mitarbeiter <- data.frame(
+  name = c("Dumbledore", "Rubeus Hagrid", "Minerva McGonagall", "Severus Snape"),
+  beruf = c("Schulleiter", "Wildhüter", "Lehrer_in", "Lehrer_in"),
+  alter = c(102, 54, 65, 55)
+)
+
+hogwarts_mitarbeiter 
+
+hogwarts_mitarbeiter[2,2]
+hogwarts_mitarbeiter[2,1:3]
+hogwarts_mitarbeiter$name
+hogwarts_mitarbeiter$beruf[1]
+
+```
+
+Grundsätzlich ist es empfehlenswert, zu Beginn einer Analyse eine Übersicht über die Daten zu erhalten. Dies ist z. B. durch die Funktion str() zu erreichen. Für jede Variabel wird die Klasse und die ersten Ausprägungen dargestellt.
+
+```{r taschenrechner12, echo=TRUE, message=FALSE, warning=FALSE}
+
+str(hogwarts_mitarbeiter)
+
+
+
+```
+Eine weitere praktische Funktion um einen Überblick zu erhalten ist die Funktion Summary(). Auch hier erhält, wird die Klasse pro Variable dargestellt. Für numerische Variablen erhält man weiterhin Informationen über die Verteilung.
+
+
+
+```{r taschenrechner_sum, echo=TRUE, message=FALSE, warning=FALSE}
+
+summary(hogwarts_mitarbeiter)
+
+
+
+```
+
+Durch head() ist es möglich nur eine gewisse Anzahl von Zeilen auszugeben. 
+
+
+```{r taschenrechner13, echo=TRUE, message=FALSE, warning=FALSE}
+
+head(hogwarts_mitarbeiter,5)
+
+
+
+```
+
+
+Die Funktion mean() in Kombination mit der Auswahl einer numerischen Variable bestimmt den Durchschnitt
+
+
+```{r taschenrechner14, echo=TRUE, message=FALSE, warning=FALSE}
+
+mean(hogwarts_mitarbeiter$alter)
+
+
+
+```
+
+Durch Subset() können Dataframes in Base r gefiltert werden. In diesem Beispiel werden alle Zeilen ausgeben, in denen der Name nicht Dumbledore ist. 
+
+
+```{r taschenrechner15, echo=TRUE, message=FALSE, warning=FALSE}
+
+subset(hogwarts_mitarbeiter, name != "Dumbledore")
+
+
+
+```
+# Packages
+
+Bereits Base R bietet viele Funktionen und Möglichkeiten. Die besondere Power von R kommt jedoch durch die hohe Anzahl an verschieden Packages, die den Funktionsumfang deutlich erweitern. Packages können von jeden erstellt werden. Bevor diese jedoch über CRAN (install.packages) heruntergeladen werden können, hat eine andere freiwillige Person dieses überprüft. Packages können auch abseits von CRAN installiert werden. Hier ist jedoch Vorsicht geboten, da unklar sein kann, was dieses Paket enthält (Viren).
+
+```{r packages, echo=TRUE, message=FALSE, warning=FALSE,eval = FALSE}
+
+install.packages("tidyverse")
+
+
+
+
+```
+
+Packages müssen nur einmal in dem entsprechenden Environment installiert werden. Bevor das Packages jedoch nutzbar ist, muss es pro Session per library(tidyverse) aktiviert werden.
+
+
+
+```{r packages2, echo=TRUE, message=FALSE, warning=FALSE}
+
+library(tidyverse)
+
+
+
+```
+
+
+Tidyverse bietet viele verschiedene Funktionen zum Arbeiten mit Daten. Neben diesen Funktionen kommt mit Tidyverse auch die Möglichkeit einer anderen Syntax -Konzept zu nutzen. Hierbei spielt der Pipe-Operatur %>% die entscheidende Rolle. Durch %>% können Argumente und Daten auf einfache Weise an die nächste Funktion übergeben werden und erleichter deutlich das Arbeiten und Lesen von RCode. Durch %>% werden hier beispielsweise die daten aus dem Dataframe an die Funktion filter übergeben. DieDaten werden auf alle Zeilen gefiltert, die in der Variable name die Ausprägung Dumbledore haben.
+
+
+
+
+
+```{r pipe4, echo=TRUE, message=FALSE, warning=FALSE}
+
+
+
+hogwarts_mitarbeiter %>%  filter( name == "Dumbledore")
+
+
+
+```
+
+
+
+Durch die Funktion group_by werden die Daten anhand des Inputs gruppiert. Group_by erfordert eine weitere Funktion, in der die Berechnungsart pro Gruppe definiert werden muss. Hier gibt es unzählige Möglichkeiten. In diesem Beispiel wird die Anzahl der Ausprägungen pro Gruppe gezählt.
+
+
+
+```{r pipe5, echo=TRUE, message=FALSE, warning=FALSE}
+
+
+
+
+hogwarts_mitarbeiter %>%  group_by(beruf) %>% count()
+
+```
+
+Besonders mächtig in Kombination mit Group_by ist die Funktion summarise. In dieser Funktion kann die Operation, die pro Gruppe durchgeführt wird, manuell definiert werden. In diesem Beispiel wird für jede Gruppe der gruppenspezifische Mittelwert berechnet.
+
+```{r pipe6, echo=TRUE, message=FALSE, warning=FALSE}
+
+
+
+
+hogwarts_mitarbeiter %>%  group_by(beruf) %>% summarise(d_alter = mean(alter))
+
+```
+
+
+### Loops
+
+#### For-Loop
+
+In For-Loops wird über ein zu definierendes Element iteriert. So kann für jedes beispielsweise für jede Zeile in einem Dataframe eine Berechnung durchgeführt werden.
+
+```{r pipe546, echo=TRUE, message=FALSE, warning=FALSE}
+for (i in 1:10){
+  print(i)
+}
+
+```
+
+#### While-Loop
+
+In einem While-Loop wird die Funktion innerhalb des Loops so lange iterativ durchgeführt, bis die in While definierte Bedingung nicht mehr erfüllt ist.
+
+```{r pipe546r, echo=TRUE, message=FALSE, warning=FALSE}
+i <- 1
+while (i < 6) {
+  print(i)
+  i = i+1
+}
+
+```
+
+
+
+
+# Einlesen der Daten für die Hausarbeit
+
+
+## Bundestag
+
+
+```{r bundestag, echo=TRUE, message=FALSE, warning=FALSE}
+
+#Laden Library
+library(plotly)
+library(dplyr)
+library(jsonlite)
+
+
+# Laden der Bundestag Daten
+filename <- file.choose()
+Bundestag <- readRDS(filename)
+
+
+
+# Erste fÃ¼nf Zeilen sehen
+#View(head(Bundestag))
+
+# Ãueberblick
+str(Bundestag)
+summary(Bundestag)
+
+# Filtern der Daten nach Partein. Anschliessend nach Parteien gruppieren und die Anzahl der Reden zÃ¤hlen
+party_speech <- Bundestag %>% filter(party != 	'NA' & date >= '2017-01-01' ) %>% group_by(party)  %>% count()
+
+
+
+# Definieren der Farben - Parteifarben
+colors <- c('rgb(139,69,19)', 'rgb(0,0,0)', 'rgb(255,237,0)', 'rgb(100,161,45)', 'rgb(255, 255, 255)', 'rgb(104,34,139)'  ,'rgb(227, 0, 15)')
+
+
+# Plotly
+fig <- plot_ly(party_speech, labels = ~party, values = ~n, type = 'pie',
+
+               textposition = 'inside',
+
+               textinfo = 'label+percent',
+
+               insidetextfont = list(color = '#FFFFFF'),
+
+               hoverinfo = 'text',
+
+               text = ~paste( n, ' Reden'),
+
+               marker = list(colors = colors,
+
+                             line = list(color = '#FFFFFF', width = 1)),
+
+
+               showlegend = FALSE)
+
+# Layout
+fig <- fig %>% layout(title = 'Verteilung der Reden nach Partei seit 2017',
+
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+# AusfÃ¼hren
+fig
+
+
+```
+
+
+
+
+
+
+
+
+## Kreml Data
+
+```{r kreml, echo=TRUE, message=FALSE, warning=FALSE}
+setwd('C:\\Users\\Drecker\\Documents\\Lehre')
+# load data
+kreml <- lapply(readLines(".\\Daten\\kremlin_transcripts_en_2021_03_01.json"), fromJSON)
+
+
+# Umwandeln von List in List zu dataframe
+kreml_data <- data.frame(id = as.integer(), date = as.character(), title = as.character(), text = as.character())
+for (i in 1:length(kreml)){
+
+  doc <- data.frame(id = kreml[[i]]$`_source`$kremlin_id, date = kreml[[i]]$`_source`$date, title = kreml[[i]]$`_source`$title, text = kreml[[i]]$`_source`$transcript)
+  kreml_data <- bind_rows(kreml_data, doc )
+}
+
+# Erstellen einer Day Spalte
+kreml_data <- kreml_data %>% mutate(weekday = weekdays(as.Date(kreml_data$date)) )
+
+# Group by weekday
+plot_data <-kreml_data %>%
+            group_by(weekday) %>%
+            count()
+
+# Ãndern des weekdays auf factor um anschlieÃssend die Tage ordnen zu kÃ¶nnen
+# Wenn dieser Schritt nicht durchgefÃ¼hrt wird werden die Tage nach Alphabet geordnet
+plot_data$weekday<- factor(plot_data$weekday, levels= c( "Montag",
+                                         "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag","Sonntag"))
+plot_data <- plot_data %>% arrange(weekday)
+
+  plot_ly(
+  x = plot_data$weekday,
+  y = plot_data$n,
+  name = "",
+  type = "bar"
+)
+
+
+
+
+```
+## Sentiment Data
+
+
+```{r sen, echo=TRUE, message=FALSE, warning=FALSE}
+setwd('C:\\Users\\Drecker\\Documents\\Lehre')
+sen_train <-   read.csv(file = ".\\Daten\\Sentiment\\Corona_NLP_train.csv")  
+sen_test <-   read.csv(file = ".\\Daten\\Sentiment\\Corona_NLP_test.csv")  
+
+
+train_stat <- sen_train %>% group_by(Sentiment)  %>% 
+  summarise(Anzahl = n(), Anteil = n()/ sen_train %>% group_by(Sentiment) %>% count() %>% ungroup(Sentiment) %>% summarise('Other'=sum(n)))
+
+train_stat 
+
+
+test_stat <- sen_test  %>% group_by(Sentiment)  %>% 
+  summarise(Anzahl = n(), Anteil = n()/ sen_test %>% group_by(Sentiment) %>% count() %>% ungroup(Sentiment) %>% summarise('Other'=sum(n)))
+
+test_stat 
+```
+## Fakenews Data
+
+
+```{r fake, echo=TRUE, message=FALSE, warning=FALSE}
+setwd('C:\\Users\\Drecker\\Documents\\Lehre')
+  
+fake <-   read.csv(file = ".\\Daten\\Fakenews_detection\\Fake.csv")  
+true <-   read.csv(file = ".\\Daten\\Fakenews_detection\\True.csv")  
+
+head(true[1])
+```

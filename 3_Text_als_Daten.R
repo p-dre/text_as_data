@@ -13,6 +13,24 @@ dplyr::glimpse(friends)
 friends_data <- friends::friends
 
 
+
+
+
+
+friends_data  %>% group_by(season, episode, scene) %>%
+  unnest_tokens(word, text) %>% count(word) %>% summarise(word_per_scene = sum(n)) %>%
+  plot_ly( type = 'scatter', mode = 'lines', color = I("blue"))%>%
+  add_trace( y = ~word_per_scene, name = 'word_per_scene')%>%
+  layout(showlegend = F) %>% 
+  layout(yaxis = list(title = 'Count'))
+
+
+
+
+
+
+
+
 friends_data %>%
   filter(speaker == "Monica Geller" | speaker == "Joey Tribbiani" | speaker == "Chandler Bing" | speaker == "Phoebe Buffay" | speaker == 'Rachel Green'
            | speaker =="Ross Geller") %>%
@@ -30,9 +48,9 @@ friends_data %>%
 #devtools::install_github("bradleyboehmke/harrypotter")
 
 
-titles <- c("Philosopher's Stone", "Chamber of Secrets", "Prisoner of Azkaban",
-            "Goblet of Fire", "Order of the Phoenix", "Half-Blood Prince",
-            "Deathly Hallows")
+titles <- c("1.Philosopher's Stone", "2.Chamber of Secrets", "3.Prisoner of Azkaban",
+            "4.Goblet of Fire", "5.Order of the Phoenix", "6.Half-Blood Prince",
+            "7.Deathly Hallows")
 books <- list(philosophers_stone, chamber_of_secrets, prisoner_of_azkaban,
               goblet_of_fire, order_of_the_phoenix, half_blood_prince,
               deathly_hallows)
@@ -43,6 +61,13 @@ for ( i in seq_along(books)){
   harry_data  <- rbind(harry_data, book)
 
 }
+
+harry_data %>% group_by(title) %>%
+  unnest_tokens(word, text) %>% filter(word == 'fear') %>% count(word) %>% 
+  plot_ly( type = 'bar', color = I("blue"))%>%
+  add_trace(x = ~title, y = ~n, name = 'Count fear')%>%
+  layout(showlegend = F) %>% 
+  layout(yaxis = list(title = 'Count'))
 
 
 

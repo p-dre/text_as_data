@@ -1,7 +1,11 @@
-# EinfÃ¼hrung R
+# Einfuehrung R
 
-# Berechnungen durchfÃ¼hren
+# Berechnungen durchführen
 1+2
+1-2
+2*2
+6/2
+2^2
 
 # Objekte zuweisen
 a <- 3*5
@@ -9,43 +13,130 @@ a
 
 b <- 4-2
 
+a* b
+
 # Je nach Input kÃ¶nnen die Objekte auch kombiniert werden
-a*b
+a* b
+
+# Objekte sind veränderlich
+a <- a* b -6 + (2*4)
+a
+
+# Objekte sinnvoll benennen
+
+mittelwert <- (1+2+3+4+5+6)/6
+Mittwelwert <- (5+6+7+8) / 4
 
 
-# Objekte haben verschiedene Klassen
-# Beispielsweise
-character()
-numeric()
-integer()
-date()
-# Nicht mit jeder Klasse kann jede Berechnung durchgefÃ¼hrt werden
-# Viele Fehlermeldungen lassen sich auf die falsche Klasse zurÃ¼ckfÃ¼hren
-# So kann ein Objekt auch die Klasse character() beinhalten
 
-ob <- c('Harry', 'Ron', "Hermine")
 
-# Auf inhalte Objekte kann beispielsweise Ã¼ber [] zugegriffen werden
-ob[1]
+# Funktionen
+word_printer <- function(word){
+  print(paste('Dies ist ein Wort:', word ))
+}
 
-# Eine wichtige Objektklasse ist das data.frame()
-Name <- c('Harry', 'Ron', "Hermine", "Hermine")
-Zauberstablaenge <- c(77, 41, 323, 1)
-data <- data.frame(Name, Zauberstablaenge)
-class(data)
-# Auf Daten im data.frame (und Matrizen) kann auf unterschiedliche weise zugegriffen werden
-# Die erste Zahl definiert die Zeile die zweite die Spalte
-data[1,2]
+word_printer('hallo')
 
-# Es kann auch auf ganze Zeilen oder Spalten zugegriffen werden
-data[,2]
-data[1,]
+# Datenstrukturen
+text <- "Mittwoch ist Spritwoch"
+class(text)
+zahl <- 1
+class(zahl)
+zahl <- "1"
+class(zahl)
+zahl <- 1.1
+class(zahl)
+date <- as.Date("2020-05-05")
+class(date)
 
-# Dateframes bieten den Vorteil auch direkt Ã¼ber den Spaltenamen zugriff zu erhalten
-# Dies ist zu empfehlen
+x <- "apfel" == "birnen"
+x
+class(x)
 
-data$Name
-data$Zauberstablaenge[1]
+
+# Vektoren
+
+
+vektor_zahlen <- c(1,2,3,4,5)
+
+vektor_zahlen
+
+vektor_text <- c("Dumbledore", "Rubeus Hagrid", "Minerva McGonagall")
+vektor_text
+
+vektor_text[1]
+vektor_text[c(1,2)]
+
+
+
+vektor_zahlen_2 <- c(8,9,0,23,3)
+
+vektor_zahlen * vektor_zahlen_2
+
+
+mean(vektor_zahlen)
+length(vektor_zahlen * vektor_zahlen_2)
+sum(vektor_zahlen * vektor_zahlen_2)
+sd(vektor_zahlen_2)
+
+# Listen 
+mitarbeiter <- list(name = "Dumbledore", "Rubeus Hagrid", "Minerva McGonagall", ort ="hogwarts", Land = "uk",  postleitzahl = 48151 )
+mitarbeiter
+
+mitarbeiter$name
+
+mitarbeiter[1]
+mitarbeiter[[2]]
+mitarbeiter[2]
+
+
+
+# Matrizen
+x <- 1:9
+m <- matrix(x, nrow = 3)
+m
+
+colnames(m) <- c("eins", "zwei", "drei")
+rownames(m)<- c("eins", "zwei", "drei")
+m
+
+m[,2]
+
+# Dataframe
+
+hogwarts_mitarbeiter <- data.frame(
+  name = c("Dumbledore", "Rubeus Hagrid", "Minerva McGonagall", "Severus Snape"),
+  beruf = c("Schulleiter", "Wildhüter", "Lehrer_in", "Lehrer_in"),
+  alter = c(102, 54, 65, 55)
+)
+
+hogwarts_mitarbeiter 
+
+hogwarts_mitarbeiter[2,2]
+hogwarts_mitarbeiter[2,1:3]
+hogwarts_mitarbeiter$name
+hogwarts_mitarbeiter$beruf[1]
+
+
+
+# Überblick
+str(hogwarts_mitarbeiter)
+summary(hogwarts_mitarbeiter)
+head(hogwarts_mitarbeiter,5)
+mean(hogwarts_mitarbeiter$alter)
+subset(hogwarts_mitarbeiter, name != "Dumbledore")
+
+
+# Tidyverse
+install.packages("tidyverse")
+library(tidyverse)
+
+
+hogwarts_mitarbeiter %>%  filter( name == "Dumbledore")
+
+hogwarts_mitarbeiter %>%  group_by(beruf) %>% count()
+
+hogwarts_mitarbeiter %>%  group_by(beruf) %>% summarise(d_alter = mean(alter))
 
 
 # Loops
@@ -54,7 +145,7 @@ for (i in 1:10){
   print(i)
 }
 
-# while
+
 
 i <- 1
 while (i < 6) {
@@ -62,30 +153,20 @@ while (i < 6) {
   i = i+1
 }
 
-# Funktionen
-
-word_printer <- function(word){
-                              print(paste('Dies ist ein Wort:', word ))
-                            }
-
-word_printer('hallo')
 
 
-# Neben diesen Bais R gibt es verschiedene Pakete die das Arbeiten mit R deutlich erleichtern
-# Diese Pakete beinhalten verschiedenste Funktionen
-# Eine der beliebtesten Pakte ist tidyverse
-# tidyverse beinhaltet verschiedene Pakete zusammengesaat in einem
-# Durch dieses Paket wird das ARbeiten mit Daten deutlich erleichtert
-# Es gibt das entsprechnde Paket auch für Textdaten Tidytext
-# Durch %>% werden die Daten vin die nächste Funktion weiter gegeben
-library(tidyverse)
-data %>% select(Name)
-data %>%
-  group_by(Name) %>%
-  summarise(avg_Zauberstablaenge = mean(Zauberstablaenge))
 
 
-# Bundestag Ãœberblick ############################################################
+
+
+
+
+
+
+
+
+
+# Bundestag Ueberblick ############################################################
 
 #Laden Library
 library(plotly)
@@ -188,5 +269,34 @@ plot_data <- plot_data %>% arrange(weekday)
   type = "bar"
 )
 
+##############################################################################################################
+#Sentiment
+
+sen_train <-   read.csv(file = ".\\Daten\\Sentiment\\Corona_NLP_train.csv")  
+sen_test <-   read.csv(file = ".\\Daten\\Sentiment\\Corona_NLP_test.csv")  
 
 
+train_stat <- sen_train %>% group_by(Sentiment)  %>% 
+  summarise(Anzahl = n(), Anteil = n()/ sen_train %>% group_by(Sentiment) %>% count() %>% ungroup(Sentiment) %>% summarise('Other'=sum(n)))
+
+train_stat 
+
+
+test_stat <- sen_test  %>% group_by(Sentiment)  %>% 
+  summarise(Anzahl = n(), Anteil = n()/ sen_test %>% group_by(Sentiment) %>% count() %>% ungroup(Sentiment) %>% summarise('Other'=sum(n)))
+
+test_stat 
+  
+  
+  
+#################################################################################################################  
+#Fake News 
+  
+fake <-   read.csv(file = ".\\Daten\\Fakenews_detection\\Fake.csv")  
+true <-   read.csv(file = ".\\Daten\\Fakenews_detection\\True.csv")  
+  
+  
+  
+  
+  
+  

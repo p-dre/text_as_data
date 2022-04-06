@@ -58,6 +58,34 @@ friends_data %>%
 In der Wordcloud befinden sich die Worte die pro Hauptcharakter am meisten genutzt wurden in der Mitte. Je größer die Wörter, umso mehr wurden die Worte genutzt.
 Auffällig ist, dass Wörter, die häufiger vorkommen, geringen Inhalt transportieren. Nichtsdestotrotz lassen sich bereits erste Aussagen treffen. So zeigt sich bei allen Hauptcharakteren, dass Personen, mit denen diese häufiger interagieren, auch öfter genannt werden. So sagt Rachel häufiger Ross und auch bei Ross ist Rachel unter den meisten genannten Wörtern. Außerdem ist bei Ross ein familiärer Fokus festzustellen und bei Monika die Bedeutung von Liebe und Heiraten. Auch bei den anderen Hauptcharaktern zeigen sich erste Inhalte aus der Serie.
 
+
+
+
+
+```{r friendstime, echo=FALSE, message=FALSE, warning=FALSE}
+
+friends_data  %>% group_by(season, episode, scene) %>%
+  unnest_tokens(word, text) %>% count(word) %>% summarise(word_per_scene = sum(n)) %>%
+  plot_ly( type = 'scatter', mode = 'lines', color = I("blue"))%>%
+  add_trace( y = ~word_per_scene, name = 'word_per_scene')%>%
+  layout(showlegend = F) %>% 
+  layout(yaxis = list(title = 'Count'))
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Harry Potter 
 
 
@@ -65,6 +93,56 @@ Beim Harry Potter Datensatz müssen Bearbeitungschritte durchgeführt werden, um
 Die einzelnen Harry Potter Bücher sind als Listen im package gespeichert. Ziel ist es alle Bücher in einer Tabelle zu speichern. 
 Hierfür wird einen Liste mit den Titel der Bücher und eine Liste der Liste der Büchern erstellt. In einem loop werden nun für jedes Buch in einer Spalte der Titel und der Text des entsprechend Buches gespeichert. 
 In jeder Zeile befindet sich also nach dem Loop ein Buch. 
+
+
+
+
+
+
+
+
+```{r fear, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+setwd('C:/Users/Drecker/Documents/Lehre')
+
+titles <- c("1.Philosopher's Stone", "2.Chamber of Secrets", "3.Prisoner of Azkaban",
+            "4.Goblet of Fire", "5.Order of the Phoenix", "6.Half-Blood Prince",
+            "7.Deathly Hallows")
+books <- list(philosophers_stone, chamber_of_secrets, prisoner_of_azkaban,
+              goblet_of_fire, order_of_the_phoenix, half_blood_prince,
+              deathly_hallows)
+
+harry_data <- tibble()
+for ( i in seq_along(books)){
+  book <- tibble(title = titles[i],text = toString(books[[i]]))
+  harry_data  <- rbind(harry_data, book)
+
+}
+
+save(harry_data, file = ".\\Daten\\harry_data.Rda")
+
+
+
+harry_data %>% group_by(title) %>%
+  unnest_tokens(word, text) %>% filter(word == 'fear') %>% count(word) %>% 
+  plot_ly( type = 'bar', color = I("blue"))%>%
+  add_trace(x = ~title, y = ~n, name = 'Count fear')%>%
+  layout(showlegend = F) %>% 
+  layout(yaxis = list(title = 'Count'))
+
+
+
+
+
+```
+
+
+
+
+
+
+
 
 Für das Erstellen der Wordcloud wird genauso vorgegangen wie oben beid en Friendsdaten. Gruppiert wird jedoch nach den Büchern. 
 

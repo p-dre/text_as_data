@@ -1,0 +1,140 @@
+---
+title: "5_Text_als_Daten_html"
+author: "Paul Drecker"
+date: '2022-04-02'
+output: html_document
+---
+# Laden der Packages
+```{r cars, echo=TRUE, message=FALSE, warning=FALSE}
+library(friends)
+library(dplyr)
+library(tidytext)
+library(quanteda)
+library(quanteda.textplots)
+library(reshape2)
+library(wordcloud)
+library(udpipe)
+```
+
+# Laden der Daten
+
+```{r daten, echo=TRUE, message=FALSE, warning=FALSE}
+setwd('C:/Users/Drecker/Documents/Lehre')
+load(".\\Daten\\harry_data.Rda")
+
+```
+
+
+
+# Preprocessing
+
+In der Grafik unten findet sich die häufigst genutzen Worte pro Harry Potter Buch. Hier wurde kein Preprocessing vorgenommen. 
+
+
+```{r token, echo=TRUE, message=FALSE, warning=FALSE}
+harry_data %>% corpus %>%  tokens() %>%
+  dfm(verbose = FALSE) %>%
+  dfm_group(groups = title) %>%
+  quanteda.textplots::textplot_wordcloud(comparison = TRUE, max.words = 400,title.size = 1)
+
+```
+
+
+
+
+```{r punk, echo=TRUE, message=FALSE, warning=FALSE}
+harry_data %>% corpus %>%  tokens() %>%
+  tokens(remove_punct = TRUE, remove_numbers = TRUE, remove_symbols = TRUE) %>%
+  dfm(verbose = FALSE) %>%
+  dfm_group(groups = title) %>%
+  quanteda.textplots::textplot_wordcloud(comparison = TRUE, max.words = 400,title.size = 1)
+
+```
+
+
+```{r stopword, echo=TRUE, message=FALSE, warning=FALSE}
+harry_data %>% 
+  corpus %>% tokens(remove_punct = TRUE, remove_numbers = TRUE, remove_symbols = TRUE) %>%
+  tokens_remove( c(stopwords("english"))) %>%
+  dfm(verbose = FALSE) %>%
+  dfm_group(groups = title) %>%
+  quanteda.textplots::textplot_wordcloud(comparison = TRUE, max.words = 400,title.size = 1)
+
+```
+
+
+
+
+
+```{r stream, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
+harry_data %>%
+  corpus %>%  
+  tokens(remove_punct = TRUE, remove_numbers = TRUE, remove_symbols = TRUE) %>% 
+  tokens_remove( c(stopwords("english"))) %>%
+  #tokens_wordstem( language = quanteda_options("english")) %>%
+  tokens_ngrams( n = 1) %>%
+  dfm(verbose = FALSE) %>%
+  dfm_group(groups = title) %>%
+  quanteda.textplots::textplot_wordcloud(comparison = TRUE, max.words = 400,title.size = 1)
+
+```
+
+
+
+```{r leam, echo=TRUE, message=FALSE, warning=FALSE}
+
+
+
+harry_corpus <- harry_data %>% corpus()
+
+lemma_en <- udpipe_download_model(language = "english")
+lemma_en <- udpipe_load_model(file = lemma_en$file_model)
+lemma_en  <- udpipe(harry_corpus, lemma_en, parallel.cores = 8)
+lemma_en <- lemma_en %>% filter(upos != 'PUNCT' & is.na(lemma) == F)
+
+harry_token <-harry_corpus %>%  
+  tokens(remove_punct = TRUE, remove_numbers = TRUE, remove_symbols = TRUE) %>% 
+  tokens_remove( c(stopwords("english"),"c") ) %>%
+  tokens_ngrams( n = 1) 
+
+
+harry_token <-   tokens_replace(tokens(harry_token), pattern = lemma_en$token, replacement = lemma_en$lemma)
+
+
+harry_token  %>%
+  dfm(verbose = FALSE) %>%
+  dfm_group(groups = title)
+
+harry_dfm <- harry_token  %>%
+              dfm(verbose = FALSE) %>%
+              dfm_group(groups = title)
+
+harry_dfm%>%
+  quanteda.textplots::textplot_wordcloud(comparison = TRUE, max.words = 400,title.size = 1)
+
+
+
+```
+
+```{r tfidf, echo=TRUE, message=FALSE, warning=FALSE}
+
+
+
+
+
+
+ harry_token  %>%
+  dfm(verbose = F)  %>% 
+  dfm_group(groups = title) %>% 
+  dfm_tfidf() %>%
+  tidy()%>%
+  acast(term ~ document, value.var = "count", fill = 0) %>%
+  comparison.cloud( title.size = 1, random.order = FALSE, max.words = 400)
+ 
+
+
+
+```
+
+
